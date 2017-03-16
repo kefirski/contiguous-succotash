@@ -12,11 +12,11 @@ class Decoder(nn.Module):
 
         self.params = params
 
-        self.kernels = [Parameter(t.Tensor(out_chan, in_chan, width).uniform_(-1, 1))
+        self.kernels = [Parameter(t.Tensor(out_chan, in_chan, width).normal_(0, 0.05))
                         for out_chan, in_chan, width in params.decoder_kernels]
         self._add_to_parameters(self.kernels, 'decoder_kernel')
 
-        self.biases = [Parameter(t.Tensor(out_chan).uniform_(-1, 1))
+        self.biases = [Parameter(t.Tensor(out_chan).normal_(0, 0.05))
                        for out_chan, in_chan, width in params.decoder_kernels]
         self._add_to_parameters(self.biases, 'decoder_bias')
 

@@ -10,11 +10,11 @@ class TDNN(nn.Module):
 
         self.params = params
 
-        self.kernels = [Parameter(t.Tensor(out_dim, self.params.char_embed_size, kW).uniform_(-1, 1))
+        self.kernels = [Parameter(t.Tensor(out_dim, self.params.char_embed_size, kW).normal_(0, 0.05))
                         for kW, out_dim in params.kernels]
         self._add_to_parameters(self.kernels, 'TDNN_kernel')
 
-        self.biases = [Parameter(t.Tensor(out_dim).uniform_(-1, 1))
+        self.biases = [Parameter(t.Tensor(out_dim).normal_(0, 0.05))
                        for _, out_dim in params.kernels]
         self._add_to_parameters(self.biases, 'TDNN_biases')
 
