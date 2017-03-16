@@ -11,15 +11,15 @@ from model.rvae_dilated import RVAE_dilated
 
 if __name__ == "__main__":
 
-    if not os.path.exists('../data/word_embeddings.npy'):
+    if not os.path.exists('data/word_embeddings.npy'):
         raise FileNotFoundError("word embeddings file was't found")
 
     parser = argparse.ArgumentParser(description='RVAE_dilated')
     parser.add_argument('--num-iterations', type=int, default=120000, metavar='NI',
                         help='num iterations (default: 120000)')
-    parser.add_argument('--batch-size', type=int, default=2, metavar='BS',
+    parser.add_argument('--batch-size', type=int, default=32, metavar='BS',
                         help='batch size (default: 32)')
-    parser.add_argument('--use-cuda', type=bool, default=False, metavar='CUDA',
+    parser.add_argument('--use-cuda', type=bool, default=True, metavar='CUDA',
                         help='use cuda (default: True)')
     parser.add_argument('--learning-rate', type=float, default=0.00005, metavar='LR',
                         help='learning rate (default: 0.00005)')
@@ -34,7 +34,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    batch_loader = BatchLoader('../')
+    batch_loader = BatchLoader('')
     parameters = Parameters(batch_loader.max_word_len,
                             batch_loader.max_seq_len,
                             batch_loader.words_vocab_size,
