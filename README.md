@@ -4,6 +4,8 @@
 This is the implementation of Zichao Yang's [Improved Variational Autoencoders for Text Modeling using Dilated Convolutions](https://arxiv.org/abs/1702.08139)
 with Kim's [Character-Aware Neural Language Models](https://arxiv.org/abs/1508.06615) embedding for tokens
 
+![model](images/model.png)
+
 Most of the implementations about the recurrent variational autoencoder are adapted from [analvikingur/pytorch_RVAE](https://github.com/analvikingur/pytorch_RVAE)
 
 ## Usage
