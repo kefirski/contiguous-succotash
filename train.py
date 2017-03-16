@@ -56,7 +56,7 @@ if __name__ == "__main__":
 
     for iteration in range(args.num_iterations):
 
-        cross_entropy, kld, coef = train_step(iteration, args.batch_size, args.use_cuda, args.dropout)
+        cross_entropy, kld, _ = train_step(iteration, args.batch_size, args.use_cuda, args.dropout)
 
         if iteration % 5 == 0:
             print('\n')
@@ -67,8 +67,6 @@ if __name__ == "__main__":
             print(cross_entropy.data.cpu().numpy()[0])
             print('-------------KLD--------------')
             print(kld.data.cpu().numpy()[0])
-            print('-----------KLD-coef-----------')
-            print(coef)
             print('------------------------------')
 
         if iteration % 10 == 0:
