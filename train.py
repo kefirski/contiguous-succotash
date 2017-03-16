@@ -17,8 +17,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='RVAE_dilated')
     parser.add_argument('--num-iterations', type=int, default=120000, metavar='NI',
                         help='num iterations (default: 120000)')
-    parser.add_argument('--batch-size', type=int, default=32, metavar='BS',
-                        help='batch size (default: 32)')
+    parser.add_argument('--batch-size', type=int, default=20, metavar='BS',
+                        help='batch size (default: 20)')
     parser.add_argument('--use-cuda', type=bool, default=True, metavar='CUDA',
                         help='use cuda (default: True)')
     parser.add_argument('--learning-rate', type=float, default=0.00005, metavar='LR',
@@ -93,7 +93,6 @@ if __name__ == "__main__":
 
             print('\n')
             print('------------SAMPLE------------')
-            print('------------------------------')
             print(sample)
             print('------------------------------')
 

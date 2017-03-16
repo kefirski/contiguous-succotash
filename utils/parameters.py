@@ -21,12 +21,11 @@ class Parameters:
         self.kernels = [(1, 25), (2, 50), (3, 75), (4, 100), (5, 125), (6, 150)]
         self.sum_depth = fold(lambda x, y: x + y, [depth for _, depth in self.kernels], 0)
 
-        self.decoder_dilations = [1, 2, 4, 8, 16]
-        self.decoder_kernels = [(1700, self.latent_variable_size + self.word_embed_size, 3),
-                                (2400, 1700, 3),
-                                (3100, 2400, 3),
-                                (4400, 3100, 3),
-                                (7000, 4400, 3)]
+        self.decoder_dilations = [1, 2, 4, 8]
+        self.decoder_kernels = [(1200, self.latent_variable_size + self.word_embed_size, 3),
+                                (1600, 1200, 3),
+                                (2000, 1600, 3),
+                                (2400, 2000, 3)]
         self.decoder_num_layers = len(self.decoder_kernels)
         ''' paddings in thin case is necessary to prevent using t+i-th token in t-th token prediction.
             paddings are resized because kernel width is increased when dilation is performed

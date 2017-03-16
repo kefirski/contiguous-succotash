@@ -20,6 +20,8 @@ class Encoder(nn.Module):
                            batch_first=True,
                            bidirectional=True)
 
+        self.hw = Highway(self.params.encoder_rnn_size * 2, 3, F.relu)
+
     def forward(self, input):
         """
         :param input: [batch_size, seq_len, embed_size] tensor
@@ -43,5 +45,9 @@ class Encoder(nn.Module):
         final_state = final_state[-1]
         h_1, h_2 = final_state[0], final_state[1]
         final_state = t.cat([h_1, h_2], 1)
+
+        final_state = final_state.view(-1, self.params.encoder_rnn_size * 2)
+        final_state = self.hw(final_state)
+        final_state = final_state.view(batch_size, seq_len, self.params.encoder_rnn_size * 2)
 
         return final_state
