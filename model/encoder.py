@@ -39,7 +39,7 @@ class Encoder(nn.Module):
 
         ''' Unfold rnn with zero initial state and get its final state from the last layer
         '''
-        _, (_, final_state) = self.rnn(input)
+        _, (final_state, _) = self.rnn(input)
 
         final_state = final_state.view(self.params.encoder_num_layers, 2, batch_size, self.params.encoder_rnn_size)
         final_state = final_state[-1]

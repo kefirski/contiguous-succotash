@@ -107,7 +107,7 @@ class RVAE_dilated(nn.Module):
             cross_entropy = F.cross_entropy(logits, target)
 
             # since cross enctropy is averaged over seq_len, it is necessary to approximate new kld
-            loss = cross_entropy + kld / 79
+            loss = 79 * cross_entropy + kld
 
             optimizer.zero_grad()
             loss.backward()
