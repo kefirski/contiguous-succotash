@@ -22,7 +22,8 @@ class Perplexity(nn.Module):
 
         log_probs = log_probs.view(batch_size, seq_len, input_size)
         target = target.unsqueeze(2)
-        out = t.gather(log_probs, dim=2, index=target).squeeze(2)
+
+        out = t.gather(log_probs, dim=2, index=target).squeeze(2).neg()
 
         ppl = out.mean(1).exp()
 
