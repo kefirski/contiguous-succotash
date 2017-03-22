@@ -20,12 +20,11 @@ class Parameters:
         self.encoder_rnn_size = 150
         self.encoder_num_layers = 2
 
-        self.latent_variable_size = 65
+        self.latent_variable_size = 90
 
-        self.decoder_dilations = [1, 2, 4, 2]
+        self.decoder_dilations = [1, 2, 4]
         self.decoder_kernels = [(400, self.latent_variable_size + self.word_embed_size, 3),
                                 (450, 400, 3),
-                                (450, 450, 3),
                                 (500, 450, 3)]
         self.decoder_num_layers = len(self.decoder_kernels)
 

@@ -8,6 +8,7 @@ from .decoder import Decoder
 from .encoder import Encoder
 
 from selfModules.embedding import Embedding
+from selfModules.perplexity import Perplexity
 
 from utils.functional import kld_coef, parameters_allocation_check, fold
 
@@ -89,6 +90,8 @@ class RVAE_dilated(nn.Module):
         return [p for p in self.parameters() if p.requires_grad]
 
     def trainer(self, optimizer, batch_loader):
+        perplexity = Perplexity()
+
         def train(i, batch_size, use_cuda, dropout):
             input = batch_loader.next_batch(batch_size, 'train')
             input = [Variable(t.from_numpy(var)) for var in input]
@@ -108,16 +111,19 @@ class RVAE_dilated(nn.Module):
 
             # since cross enctropy is averaged over seq_len, it is necessary to approximate new kld
             loss = 79 * cross_entropy + kld
+            ppl = perplexity(logits, target).mean()
 
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
 
-            return cross_entropy, kld, kld_coef(i)
+            return ppl, kld
 
         return train
 
     def validater(self, batch_loader):
+        perplexity = Perplexity()
+
         def validate(batch_size, use_cuda):
             input = batch_loader.next_batch(batch_size, 'valid')
             input = [Variable(t.from_numpy(var)) for var in input]
@@ -134,9 +140,9 @@ class RVAE_dilated(nn.Module):
             logits = logits.view(-1, self.params.word_vocab_size)
             target = target.view(-1)
 
-            cross_entropy = F.cross_entropy(logits, target)
+            ppl = perplexity(logits, target).mean()
 
-            return cross_entropy, kld
+            return ppl, kld
 
         return validate
 
