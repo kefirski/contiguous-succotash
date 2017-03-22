@@ -111,6 +111,9 @@ class RVAE_dilated(nn.Module):
 
             # since cross enctropy is averaged over seq_len, it is necessary to approximate new kld
             loss = 79 * cross_entropy + kld
+
+            logits = logits.view(batch_size, -1, self.params.word_vocab_size)
+            target = target.view(batch_size, -1)
             ppl = perplexity(logits, target).mean()
 
             optimizer.zero_grad()
@@ -136,9 +139,6 @@ class RVAE_dilated(nn.Module):
                                encoder_word_input, encoder_character_input,
                                decoder_word_input,
                                z=None)
-
-            logits = logits.view(-1, self.params.word_vocab_size)
-            target = target.view(-1)
 
             ppl = perplexity(logits, target).mean()
 
