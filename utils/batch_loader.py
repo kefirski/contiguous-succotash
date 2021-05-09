@@ -220,7 +220,7 @@ class BatchLoader:
 
         self.max_word_len = np.amax([len(word) for word in self.idx_to_word])
 
-        [self.word_tensor, self.character_tensor] = [np.array([np.load(target) for target in input_type])
+        [self.word_tensor, self.character_tensor] = [np.array([np.load(target, allow_pickle=True) for target in input_type])
                                                      for input_type in tensor_files]
 
         self.just_words = [word for line in self.word_tensor[0] for word in line]

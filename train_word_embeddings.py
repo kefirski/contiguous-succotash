@@ -29,6 +29,7 @@ if __name__ == '__main__':
                         batch_loader.chars_vocab_size)
 
     neg_loss = NEG_loss(params.word_vocab_size, params.word_embed_size)
+
     if args.use_cuda:
         neg_loss = neg_loss.cuda()
 
@@ -44,14 +45,18 @@ if __name__ == '__main__':
         if args.use_cuda:
             input, target = input.cuda(), target.cuda()
 
-        out = neg_loss(input, target, args.num_sample).mean()
+        #TEST
+        #out = neg_loss(input, target, args.num_sample).mean()
+        out = neg_loss.forward(input, target, args.num_sample).mean()
 
         optimizer.zero_grad()
         out.backward()
         optimizer.step()
 
         if iteration % 500 == 0:
-            out = out.cpu().data.numpy()[0]
+            #TEST
+            #out = out.cpu().data.numpy()[0]
+            out = out.item()
             print('iteration = {}, loss = {}'.format(iteration, out))
 
     word_embeddings = neg_loss.input_embeddings()

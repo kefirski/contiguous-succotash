@@ -64,16 +64,23 @@ if __name__ == "__main__":
             print('----------ITERATION-----------')
             print(iteration)
             print('---------PERPLEXITY-----------')
-            print(ppl.data.cpu().numpy()[0])
+            #TEST
+            #print(ppl.data.cpu().numpy()[0])
+            print(ppl.item())
             print('-------------KLD--------------')
-            print(kld.data.cpu().numpy()[0])
+            #TEST
+            #print(kld.data.cpu().numpy()[0])
+            print(kld.item())
             print('------------------------------')
 
         if iteration % 10 == 0:
             ppl, kld = validate(args.batch_size, args.use_cuda)
 
-            ppl = ppl.data.cpu().numpy()[0]
-            kld = kld.data.cpu().numpy()[0]
+            #TEST
+            # ppl = ppl.data.cpu().numpy()[0]
+            # kld = kld.data.cpu().numpy()[0]
+            ppl = ppl.item()
+            kld = kld.item()
 
             print('\n')
             print('------------VALID-------------')

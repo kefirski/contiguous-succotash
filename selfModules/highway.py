@@ -1,5 +1,5 @@
 import torch.nn as nn
-import torch.nn.functional as F
+import torch as t
 
 
 class Highway(nn.Module):
@@ -35,7 +35,7 @@ class Highway(nn.Module):
         """
 
         for layer in range(self.num_layers):
-            gate = F.sigmoid(self.gate[layer](x))
+            gate = t.sigmoid(self.gate[layer](x))
 
             nonlinear = self.f(self.nonlinear[layer](x))
             linear = self.linear[layer](x)

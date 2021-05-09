@@ -34,6 +34,7 @@ class Encoder(nn.Module):
         input = self.hw1(input)
         input = input.view(batch_size, seq_len, embed_size)
 
+        #TEST
         assert parameters_allocation_check(self), \
             'Invalid CUDA options. Parameters should be allocated in the same memory'
 
