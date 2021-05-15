@@ -5,7 +5,7 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 
 from .decoder import Decoder
-from .encoder import Encoder
+from .encoder import Encoder, HREncoder
 
 from selfModules.embedding import Embedding
 from selfModules.perplexity import Perplexity
@@ -23,6 +23,10 @@ class RVAE_dilated(nn.Module):
 
         self.encoder = Encoder(self.params)
 
+        #TEST
+        # self.layer_dim = (self.params.encoder_num_layers * 2) * self.params.encoder_rnn_size
+        # self.context_to_mu = nn.Linear(self.layer_dim * 2, self.params.latent_variable_size)
+        # self.context_to_logvar = nn.Linear(self.layer_dim * 2, self.params.latent_variable_size)
         self.context_to_mu = nn.Linear(self.params.encoder_rnn_size * 2, self.params.latent_variable_size)
         self.context_to_logvar = nn.Linear(self.params.encoder_rnn_size * 2, self.params.latent_variable_size)
 
@@ -107,7 +111,7 @@ class RVAE_dilated(nn.Module):
 
             logits = logits.view(-1, self.params.word_vocab_size)
             target = target.view(-1)
-            cross_entropy = F.cross_entropy(logits, target)
+            cross_entropy = F.cross_entropy(logits, target, reduction="sum")
 
             # since cross enctropy is averaged over seq_len, it is necessary to approximate new kld
             loss = 79 * cross_entropy + kld
@@ -120,7 +124,7 @@ class RVAE_dilated(nn.Module):
             loss.backward()
             optimizer.step()
 
-            return ppl, kld
+            return ppl, kld, loss
 
         return train
 
