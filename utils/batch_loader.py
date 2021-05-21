@@ -9,7 +9,8 @@ from .functional import *
 
 
 class BatchLoader:
-    def __init__(self, path='../../'):
+    #TEST: initially path='../../'
+    def __init__(self, path='../'):
 
         '''
             :properties
@@ -74,15 +75,18 @@ class BatchLoader:
         '''
 
         self.data_files = [path + 'data/train.txt',
-                           path + 'data/test.txt']
+                           path + 'data/test.txt',
+                           path + 'data/ptb_test.txt']
 
         self.idx_files = [path + 'data/words_vocab.pkl',
                           path + 'data/characters_vocab.pkl']
 
         self.tensor_files = [[path + 'data/train_word_tensor.npy',
-                              path + 'data/valid_word_tensor.npy'],
+                              path + 'data/valid_word_tensor.npy',
+                              path + 'data/test_word_tensor.npy'],
                              [path + 'data/train_character_tensor.npy',
-                              path + 'data/valid_character_tensor.npy']]
+                              path + 'data/valid_character_tensor.npy',
+                              path + 'data/test_character_tensor.npy']]
 
         self.blind_symbol = ''
         self.pad_token = '_'
@@ -226,7 +230,12 @@ class BatchLoader:
         self.just_words = [word for line in self.word_tensor[0] for word in line]
 
     def next_batch(self, batch_size, target_str):
-        target = 0 if target_str == 'train' else 1
+        if target_str == 'train':
+            target = 0
+        elif target_str == 'valid':
+            target = 1
+        elif target_str == 'test':
+            target = 2
 
         indexes = np.array(np.random.randint(self.num_lines[target], size=batch_size))
 
