@@ -51,7 +51,6 @@ if __name__ == "__main__":
     if args.use_cuda:
         rvae = rvae.cuda()
 
-    #TEST: adapted from HR code
     optimizer = Adam(rvae.learnable_parameters(), args.learning_rate, eps=1e-6, weight_decay=1e-5, betas=(0.5,0.9))
 
     train_step = rvae.trainer(optimizer, batch_loader)
@@ -62,9 +61,7 @@ if __name__ == "__main__":
 
     for iteration in range(args.num_iterations):
 
-        # TODO: check if this should go inside the if statement as for the validation
         ppl, kld, cross_entropy = train_step(iteration, args.batch_size, args.use_cuda, args.dropout)
-        #TEST
         batch_size = args.batch_size
         ppl = ppl.item()
         kld = kld.item()
