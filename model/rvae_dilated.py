@@ -14,21 +14,26 @@ from utils.functional import kld_coef, parameters_allocation_check, fold
 
 
 class RVAE_dilated(nn.Module):
-    def __init__(self, params):
+    def __init__(self, params, regularised):
         super(RVAE_dilated, self).__init__()
 
         self.params = params
 
         self.embedding = Embedding(self.params, '')
 
-        self.encoder = Encoder(self.params)
+        self.regularised = regularised
 
-        #TEST
-        # self.layer_dim = (self.params.encoder_num_layers * 2) * self.params.encoder_rnn_size
-        # self.context_to_mu = nn.Linear(self.layer_dim * 2, self.params.latent_variable_size)
-        # self.context_to_logvar = nn.Linear(self.layer_dim * 2, self.params.latent_variable_size)
-        self.context_to_mu = nn.Linear(self.params.encoder_rnn_size * 2, self.params.latent_variable_size)
-        self.context_to_logvar = nn.Linear(self.params.encoder_rnn_size * 2, self.params.latent_variable_size)
+        if self.regularised:
+            print("Highly regularised Encoder")
+            self.encoder = HREncoder(self.params)
+            self.layer_dim = self.params.encoder_num_layers * 2 * self.params.encoder_rnn_size
+            self.context_to_mu = nn.Linear(self.layer_dim * 2, self.params.latent_variable_size)
+            self.context_to_logvar = nn.Linear(self.layer_dim * 2, self.params.latent_variable_size)
+        elif not self.regularised:
+            print('Classic encoder')
+            self.encoder = Encoder(self.params)
+            self.context_to_mu = nn.Linear(self.params.encoder_rnn_size * 2, self.params.latent_variable_size)
+            self.context_to_logvar = nn.Linear(self.params.encoder_rnn_size * 2, self.params.latent_variable_size)
 
         self.decoder = Decoder(self.params)
 
@@ -111,20 +116,21 @@ class RVAE_dilated(nn.Module):
 
             logits = logits.view(-1, self.params.word_vocab_size)
             target = target.view(-1)
-            cross_entropy = F.cross_entropy(logits, target, reduction="sum")
+            cross_entropy = F.cross_entropy(logits, target, ignore_index=0, reduction="sum")
 
-            # since cross enctropy is averaged over seq_len, it is necessary to approximate new kld
-            loss = 79 * cross_entropy + kld
+            # since cross entropy is averaged over seq_len, it is necessary to approximate new kld
+            # loss = 79 * cross_entropy + kld
+            #loss = cross_entropy + kld
 
             logits = logits.view(batch_size, -1, self.params.word_vocab_size)
             target = target.view(batch_size, -1)
             ppl = perplexity(logits, target).mean()
 
             optimizer.zero_grad()
-            loss.backward()
+            cross_entropy.backward()
             optimizer.step()
 
-            return ppl, kld, loss
+            return ppl, kld, cross_entropy
 
         return train
 
@@ -143,12 +149,40 @@ class RVAE_dilated(nn.Module):
                                encoder_word_input, encoder_character_input,
                                decoder_word_input,
                                z=None)
-
             ppl = perplexity(logits, target).mean()
+            logits = logits.view(-1, self.params.word_vocab_size)
+            target = target.view(-1)
+            cross_entropy = F.cross_entropy(logits, target, ignore_index=0, reduction="sum")
+            #loss = cross_entropy + kld
 
-            return ppl, kld
+            return ppl, kld, cross_entropy
 
         return validate
+
+    def tester(self, batch_loader):
+        perplexity = Perplexity()
+
+        def test(batch_size, use_cuda):
+            input = batch_loader.next_batch(batch_size, 'test')
+            input = [Variable(t.from_numpy(var)) for var in input]
+            input = [var.long() for var in input]
+            input = [var.cuda() if use_cuda else var for var in input]
+
+            [encoder_word_input, encoder_character_input, decoder_word_input, _, target] = input
+
+            logits, kld = self(0.,
+                               encoder_word_input, encoder_character_input,
+                               decoder_word_input,
+                               z=None)
+            ppl = perplexity(logits, target).mean()
+            logits = logits.view(-1, self.params.word_vocab_size)
+            target = target.view(-1)
+            cross_entropy = F.cross_entropy(logits, target, ignore_index=0, reduction="sum")
+            #loss = cross_entropy + kld
+
+            return ppl, kld, cross_entropy
+
+        return test
 
     def sample(self, batch_loader, seq_len, seed, use_cuda):
         seed = Variable(t.from_numpy(seed).float())

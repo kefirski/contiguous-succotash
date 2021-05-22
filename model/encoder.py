@@ -13,10 +13,10 @@ class Encoder(nn.Module):
         self.params = params
 
         self.hw1 = Highway(self.params.sum_depth + self.params.word_embed_size, 2, F.relu)
-
         self.rnn = nn.LSTM(input_size=self.params.word_embed_size + self.params.sum_depth,
                            hidden_size=self.params.encoder_rnn_size,
                            num_layers=self.params.encoder_num_layers,
+                           dropout=0.5,
                            batch_first=True,
                            bidirectional=True)
 
@@ -25,7 +25,7 @@ class Encoder(nn.Module):
     def forward(self, input):
         """
         :param input: [batch_size, seq_len, embed_size] tensor
-        :return: context of input sentenses with shape of [batch_size, latent_variable_size]
+        :return: context of input sentences with shape of [batch_size, latent_variable_size]
         """
 
         [batch_size, seq_len, embed_size] = input.size()
@@ -60,12 +60,12 @@ class HREncoder(nn.Module):
         super(HREncoder, self).__init__()
 
         self.params = params
-        #TODO: check if want bidirectional or not (on HR)
-        self.layer_dim = (self.params.encoder_num_layers * 2) * self.params.encoder_rnn_size
+        self.layer_dim = self.params.encoder_num_layers * 2 * self.params.encoder_rnn_size
 
         self.rnn = nn.LSTM(input_size=self.params.word_embed_size + self.params.sum_depth,
                            hidden_size=self.params.encoder_rnn_size,
                            num_layers=self.params.encoder_num_layers,
+                           dropout=0.5,
                            batch_first=True,
                            bidirectional=True)
 
@@ -92,7 +92,6 @@ class HREncoder(nn.Module):
         for i in range(seq_len - 1):
             _, hx = self.rnn(input[i].unsqueeze(1), hx)
             h = self.ziphidden(*hx)
-            #print(i)
             mu = self.linear_mu(h)
             logvar = self.linear_var(h)
             h = self.reparameterize(mu, logvar)
@@ -100,21 +99,6 @@ class HREncoder(nn.Module):
             logvarx.append(logvar)
 
         return h
-        # input = input.view(-1, embed_size)
-        # input = self.hw1(input)
-        # input = input.view(batch_size, seq_len, embed_size)
-        #
-        #
-        # _, (final_state, _) = self.rnn(input)
-        #
-        # final_state = final_state.view(self.params.encoder_num_layers, 2, batch_size, self.params.encoder_rnn_size)
-        # final_state = final_state[-1]
-        # h_1, h_2 = final_state[0], final_state[1]
-        # final_state = t.cat([h_1, h_2], 1)
-        #
-        # final_state = self.hw2(final_state)
-        #
-        # return final_state
 
     def reparameterize(self, mu, logvar):
         if not self.training:
@@ -125,14 +109,7 @@ class HREncoder(nn.Module):
 
     def ziphidden(self, hidden, cell):
         b_size = hidden.shape[1]
-        # hidden = [n layers * n directions, batch size, hid dim]
-        # cell = [n layers * n directions, batch size, hid dim]
-
         h = t.cat([hidden, cell], dim=2)
-        # h = [n layers * n directions, batch size, hid dim * 2]
         h = t.transpose(h, 0, 1).contiguous()
-        # h = [batch size, n layers * n directions, hid dim * 2]
-
         h = h.view(b_size, -1)
-        # h = [batch size, n layers * n directions * hid dim * 2]
         return h
