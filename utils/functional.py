@@ -1,21 +1,15 @@
-import torch
 def fold(f, l, a):
     return a if (len(l) == 0) else fold(f, l[1:], f(a, l[0]))
 
 
 def f_and(x, y):
-    #TEST
-    #print(x,y)
     if type(x) != bool or type(y) != bool:
-        #torch.logical_and(x,y,out=x)
         return
     return x and y
 
 
 def f_or(x, y):
-    #TEST
     if type(x) != bool or type(y) != bool:
-        #torch.logical_and(x,y,out=x)
         return
     return x or y
 

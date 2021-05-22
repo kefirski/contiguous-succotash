@@ -43,12 +43,6 @@ class TDNN(nn.Module):
         x = x.view(-1, self.params.max_word_len, self.params.char_embed_size).transpose(1, 2).contiguous()
 
         xs = [t.tanh(F.conv1d(x, kernel, bias=self.biases[i])) for i, kernel in enumerate(self.kernels)]
-        #TEST
-        #xs = [x.max(2)[0].squeeze(2) for x in xs]
-        # for i in range(6):
-        #     print(xs[i].size())
-        #a = t.max(xs[0], 2)[0]
-        #xs = [t.squeeze(t.max(i,2)[0], 2) for i in xs]
         xs = [t.max(i, 2)[0] for i in xs]
         x = t.cat(xs, 1)
         x = x.view(batch_size, seq_len, -1)

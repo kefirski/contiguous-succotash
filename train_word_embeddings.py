@@ -45,8 +45,6 @@ if __name__ == '__main__':
         if args.use_cuda:
             input, target = input.cuda(), target.cuda()
 
-        #TEST
-        #out = neg_loss(input, target, args.num_sample).mean()
         out = neg_loss.forward(input, target, args.num_sample).mean()
 
         optimizer.zero_grad()
@@ -54,8 +52,6 @@ if __name__ == '__main__':
         optimizer.step()
 
         if iteration % 500 == 0:
-            #TEST
-            #out = out.cpu().data.numpy()[0]
             out = out.item()
             print('iteration = {}, loss = {}'.format(iteration, out))
 

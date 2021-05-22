@@ -34,12 +34,11 @@ class NEG_loss(nn.Module):
             loss defined in Mikolov et al. Distributed Representations of Words and Phrases and their Compositionality
             papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-their-compositionality.pdf
         """
-        # TEST
-        # assert parameters_allocation_check(self), \
-        #     """
-        #     Invalid CUDA options. out_embed and in_embed parameters both should be stored in the same memory
-        #     got out_embed.is_cuda = {}, in_embed.is_cuda = {}
-        #     """.format(self.out_embed.weight.is_cuda, self.in_embed.weight.is_cuda)
+        assert parameters_allocation_check(self), \
+            """
+            Invalid CUDA options. out_embed and in_embed parameters both should be stored in the same memory
+            got out_embed.is_cuda = {}, in_embed.is_cuda = {}
+            """.format(self.out_embed.weight.is_cuda, self.in_embed.weight.is_cuda)
 
         use_cuda = self.out_embed.weight.is_cuda
 
