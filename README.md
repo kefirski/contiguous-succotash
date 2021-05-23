@@ -53,6 +53,20 @@ $ python train.py
 
 `--regularised` –– use holistic regularisation in the encoder
 
+### To test the model after training use:
+```
+$ python predict.py
+```
+
+#### Parameters:
+`--use-cuda`
+
+`--num-iterations`
+
+`--batch-size`
+
+`--regularised` –– use holistic regularisation in the encoder
+
 ### To sample data after training use:
 ```
 $ python sample.py
